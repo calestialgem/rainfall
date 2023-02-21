@@ -1,8 +1,7 @@
 ## Type for indicating a value that might not exist because of an error.
-
+##
 ## @generic V Type of the value.
 ## @generic E Type of the error.
-
 extern union Result<type V, type E>
 {
   ## Value when the result is a success.
