@@ -2,11 +2,7 @@
 ##
 ## @generic V Type of the value.
 ## @generic E Type of the error.
-extern union Result<type V, type E>
-{
-  ## Value when the result is a success.
-  V value;
-
-  ## Error when the result is a failure.
-  E error;
-}
+##
+## @param value Value when the result is a success.
+## @param error Error when the result is a failure.
+extern union Result<type V, type E>(V value, E error);
