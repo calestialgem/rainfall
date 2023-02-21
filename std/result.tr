@@ -1,13 +1,13 @@
 ## Type for indicating a value that might not exist because of an error.
 
-## @generic Value Type of the value.
-## @generic Error Type of the error.
+## @generic V Type of the value.
+## @generic E Type of the error.
 
-extern union Result<type Value, type Error>
+extern union Result<type V, type E>
 {
   ## Value when the result is a success.
-  Value success;
+  V value;
 
   ## Error when the result is a failure.
-  Error failure;
+  E error;
 }
