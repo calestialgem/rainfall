@@ -5,4 +5,4 @@
 ##
 ## @param value Value when the result is a success.
 ## @param error Error when the result is a failure.
-extern union Result<type V, type E>(V value, E error);
+extern union Result<V, E>(V value, E error);
