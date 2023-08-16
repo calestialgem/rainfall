@@ -1,8 +1,0 @@
-## Type for indicating a value that might not exist because of an error.
-##
-## @generic V Type of the value.
-## @generic E Type of the error.
-##
-## @param value Value when the result is a success.
-## @param error Error when the result is a failure.
-extern union Result<V, E>(V value, E error);
