@@ -1,0 +1,38 @@
+extern class List<Allocator A, type E>(
+  A allocator,
+  mutable E[] array,
+  long count,
+)
+{
+  extern func count(self*) long { return count; }
+
+  extern func push(mutable self*, E element) Result<void, A.Error>
+  {
+    if (count == array.length)
+    {
+      auto newLength = findNewLength(array.length);
+      try allocator.resize(&array, newLength);
+    }
+
+    array[count] = element;
+    count++;
+  }
+
+  extern func pop(mutable self*) E
+  {
+    count--;
+    return array[count];
+  }
+
+  extern func copy<; E implements Copyable>(self*) List
+  {
+    return List(allocator, array.copy(allocator), count);
+  }
+
+  func findNewLength(long length) long
+  {
+    if (length == 0)
+      return 1;
+    return length * 2;
+  }
+}

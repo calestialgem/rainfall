@@ -1,0 +1,23 @@
+import extern "stdio.h";
+
+extern struct Path extends byte[] implements AutoDisposable
+{
+  extern func dispose(Path* disposed)
+  {
+
+  }
+}
+
+Path path;
+
+## Type for checking pointers to incomplete types.
+type FilePointer = extern "FILE";
+
+func openFilePointer()
+
+
+
+extern class Stream(FilePointer* filePointer)
+{
+
+}

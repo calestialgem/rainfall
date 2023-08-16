@@ -1,0 +1,143 @@
+## Dynamically allocated, linearly stored sequence of elements. Amortizes
+## allocations by doubling in size when growth is necessary.
+##
+## @generic A Type of the allocator that is used for the memory.
+## @generic E Type of the elements.
+##
+## @param allocator Allocator that provides the memory.
+## @param array Pointer to the array.
+## @param capacity Number of elements the array can hold.
+## @param size Amount of elements from the beginning of the array that are
+##  active.
+extern class List<A implements Allocator, E>(
+  *mutable A allocator,
+  *mutable E array,
+  long capacity,
+  long size,
+)
+  implements Allocated<A>
+{
+  ## Creates an empty list.
+  ##
+  ## @param allocator Allocator used by the created list.
+  ##
+  ## @return Created list.
+  extern func new(*mutable A allocator) List
+  {
+    return List(allocator, null, 0, 0);
+  }
+
+  ## Returns the amount of elements in the list.
+  ##
+  ## @return Amount of elements in the list.
+  extern func size(*self) long { return size; }
+
+  extern func get(*self)
+
+  ## Inserts a copy of the given allocated element to the end of the list. Grows
+  ## the list if necessary.
+  ##
+  ## @param pushed Element that is copied to the end of the list.
+  ##
+  ## @return Nothing or an allocation error.
+  extern func pushCopy<; E implements Allocated>(
+    *mutable self,
+    *E pushed,
+  )
+    Result<void, A.Error>
+  {
+    return insertToEnd(pushed.copyWith(allocator));
+  }
+
+  ## Inserts the given element to the end of the list. Grows the list if
+  ## necessary.
+  ##
+  ## @param pushed Element that is pushed to the end of the list.
+  ##
+  ## @return Nothing or an allocation error.
+  extern func push(*mutable self, E pushed) Result<void, A.Error>
+  {
+    where (E implements Allocated<A>)
+    {
+      if (pushed.allocator == allocator)
+        return insertToEnd(pushed);
+      return insertToEnd(pushed.copyWith(allocator));
+    }
+
+    where (E implements Allocated)
+      return insertToEnd(pushed.copyWith(allocator));
+
+    return insertToEnd(pushed);
+  }
+
+  ## Inserts the given element to the end of the list. Grows the list if
+  ## necessary.
+  ##
+  ## @param inserted Element that is inserted to the end of the list.
+  ##
+  ## @return Nothing or allocation error.
+  func insertToEnd(*mutable self, E inserted) Result<void, A.Error>
+  {
+    if (capacity == size)
+    {
+      auto newCapacity *= 2;
+      if (newCapacity == 0)
+        newCapacity = 1;
+
+      try allocator.reallocate(
+        &mutable array,
+        E:size * capacity,
+        E:size * newCapacity,
+        E:alignment,
+      );
+
+      capacity = newCapacity;
+    }
+
+    array[size] = inserted;
+    size++;
+  }
+
+  ## Removes the last element from the list and returns it.
+  ##
+  ## There must be a finite number of elements in the list!
+  ##
+  ## @return Removed element, which was the element at the end of the list.
+  extern func pop(*mutable self) E
+  {
+    assert size > 0;
+    size--;
+    return array[size];
+  }
+
+  override func deallocate(self)
+  {
+    where (E implements Allocated)
+      while (long i = 0; i < size; i++)
+        array[i].deallocate();
+
+    allocator.deallocate(array);
+  }
+
+  override func copy(*self) Result<self, A.Error>
+  {
+    return copyWith(allocator);
+  }
+
+  override func copyWith<C implements Allocator>(
+    *self,
+    *mutable C copyAllocator,
+  )
+    Result<self, C.Error>
+  {
+    mutable auto result = new(copyAllocator);
+
+    while (long i = 0; i < size; i++)
+      when (E implements Allocated)
+        result.pushCopy(&array[i]);
+      else
+        result.push(array[i]);
+
+    return result;
+  }
+}
