@@ -1,0 +1,48 @@
+#! Lexes a Thrice source file.
+
+import Standard.ArrayPointer;
+import Standard.Character;
+import Standard.Integer32;
+import Standard.List;
+import Standard.Natural128;
+import Standard.Path;
+import Standard.Size;
+import Standard.String;
+
+@private
+@record
+enum Token
+{
+  struct Proc { start Integer32 }
+  struct Import { start Integer32 }
+  struct Struct { start Integer32 }
+  struct Enum { start Integer32 }
+  struct OpeningParenthesis { start Integer32 }
+  struct ClosingParenthesis { start Integer32 }
+  struct OpeningBrace { start Integer32 }
+  struct ClosingBrace { start Integer32 }
+  struct At { start Integer32 }
+  struct Comma { start Integer32 }
+  struct Colon { start Integer32 }
+  struct Semicolon { start Integer32 }
+  struct LowercaseIdentifier { start Integer32, text String }
+  struct UppercaseIdentifier { start Integer32, text String }
+  struct StringConstant { start Integer32, end Integer32, value String }
+  struct IntegralConstant { start Integer32, end Integer32, value Natural128 }
+}
+
+struct Lexer
+{
+  source Path,
+  contents String,
+  tokens List[Token],
+  current Size,
+  start Size,
+  initial Character,
+}
+
+@private
+proc lex(source_path Path) List[Token]:
+{
+  var lexer = Lexer {}
+}
