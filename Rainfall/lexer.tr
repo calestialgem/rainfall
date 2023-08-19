@@ -2,9 +2,9 @@
 
 import Thrice.ArrayPointer;
 import Thrice.Character;
-import Thrice.Integer32;
+import Thrice.Integer;
 import Thrice.List;
-import Thrice.Natural128;
+import Thrice.Natural;
 import Thrice.Path;
 import Thrice.Size;
 import Thrice.String;
@@ -12,22 +12,42 @@ import Thrice.String;
 @Thrice.Visibility.Private
 enum Token
 {
-  struct Proc { start Integer32 }
-  struct Import { start Integer32 }
-  struct Struct { start Integer32 }
-  struct Enum { start Integer32 }
-  struct OpeningParenthesis { start Integer32 }
-  struct ClosingParenthesis { start Integer32 }
-  struct OpeningBrace { start Integer32 }
-  struct ClosingBrace { start Integer32 }
-  struct At { start Integer32 }
-  struct Comma { start Integer32 }
-  struct Colon { start Integer32 }
-  struct Semicolon { start Integer32 }
-  struct LowercaseIdentifier { start Integer32, text String }
-  struct UppercaseIdentifier { start Integer32, text String }
-  struct StringConstant { start Integer32, end Integer32, value String }
-  struct IntegralConstant { start Integer32, end Integer32, value Natural128 }
+  struct Proc { start Integer[32] }
+
+  struct Import { start Integer[32] }
+
+  struct Struct { start Integer[32] }
+
+  struct Enum { start Integer[32] }
+
+  struct OpeningParenthesis { start Integer[32] }
+
+  struct ClosingParenthesis { start Integer[32] }
+
+  struct OpeningBrace { start Integer[32] }
+
+  struct ClosingBrace { start Integer[32] }
+
+  struct At { start Integer[32] }
+
+  struct Comma { start Integer[32] }
+
+  struct Colon { start Integer[32] }
+
+  struct Semicolon { start Integer[32] }
+
+  struct LowercaseIdentifier { start Integer[32], text String }
+
+  struct UppercaseIdentifier { start Integer[32], text String }
+
+  struct StringConstant { start Integer[32], end Integer[32], value String }
+
+  struct IntegralConstant
+  {
+    start Integer[32],
+    end Integer[32],
+    value Natural[128],
+  }
 }
 
 struct Lexer
