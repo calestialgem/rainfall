@@ -1,5 +1,5 @@
 #! Rainfall is the original Thrice Compiler.
 
-@Standard.Entrypoint
+@Thrice.Entrypoint
 proc():
-  Standard.debug_log("Hi 3|ℇ!");
+  Thrice.debug_log("Hi 3|ℇ!");
