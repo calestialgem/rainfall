@@ -9,8 +9,7 @@ import Standard.Path;
 import Standard.Size;
 import Standard.String;
 
-@private
-@record
+@Standard.Visibility.Private
 enum Token
 {
   struct Proc { start Integer32 }
@@ -41,7 +40,7 @@ struct Lexer
   initial Character,
 }
 
-@private
+@Standard.Visibility.Private
 proc lex(source_path Path) List[Token]:
 {
   var lexer = Lexer {}
