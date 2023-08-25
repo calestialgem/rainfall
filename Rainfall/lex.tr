@@ -1,0 +1,98 @@
+#! Lexes a Thrice source file.
+
+using thrice::Boolean;
+using thrice::Character;
+using thrice::Persistance::read_all;
+using thrice::Integer32;
+using thrice::List;
+using thrice::Monostate;
+using thrice::Path;
+using thrice::Public;
+using thrice::Result;
+using thrice::Result::Failure;
+using thrice::Size;
+using thrice::String;
+
+using rainfall::Token;
+using rainfall::Token::Punctuation::ClosingBrace;
+using rainfall::Token::Punctuation::ClosingParenthesis;
+using rainfall::Token::Punctuation::OpeningBrace;
+using rainfall::Token::Punctuation::OpeningParenthesis;
+using rainfall::Token::Punctuation::Semicolon;
+
+## Transforms a file to a list of tokens.
+@Public
+proc lex(file &Path) List[Token] {
+  var lexer Lexer = Lexer(
+    file,
+    contents: file.read_all()?,
+    tokens: List[Token]::create()?,
+    current: 0,
+    line: 1,
+    column: 0,
+  );
+  while lexer.has_character() {
+    lexer.start = lexer.current;
+    lexer.initial = lexer.character();
+    lexer.advance();
+    switch lexer.initial {
+      case ' ' {}
+      case '\t' {}
+      case '\n' {}
+      case '\r' { lexer.lex_crlf(); }
+      case '#' {
+        while lexer.has_character() {
+          var character Character = lexer.character();
+          lexer.advance();
+          if character == '\r' { lexer.lex_crlf(); break; }
+          if character == '\n' { break; }
+        }
+      }
+      case '{' { lexer.tokens.insert(OpeningBrace(lexer.start)); }
+      case '}' { lexer.tokens.insert(ClosingBrace(lexer.start)); }
+      case '(' { lexer.tokens.insert(OpeningParenthesis(lexer.start)); }
+      case ')' { lexer.tokens.insert(ClosingParenthesis(lexer.start)); }
+      case ';' { lexer.tokens.insert(Semicolon(lexer.start)); }
+    }
+  }
+  return lexer.tokens;
+}
+
+## Context of the lexing process.
+struct Lexer(
+  file &Path,
+  contents String,
+  tokens List[Token],
+  current Size,
+  start Size,
+  initial Character,
+  line Integer32,
+  column Integer32,
+)
+
+## Returns whether there is at least one more character remaining in the source
+## file.
+proc has_character(lexer &Lexer) Boolean {
+  return lexer.current != lexer.contents.bytes();
+}
+
+## Returns the currently lexed character.
+proc character(lexer &Lexer) Character {
+  return lexer.contents.at(lexer.current);
+}
+
+## Goes to the next character in the source file.
+proc advance(lexer &Lexer) {
+  lexer.column++;
+  if lexer.character() == '\n' { lexer.line++; lexer.column = 0; }
+  lexer.contents.jump(lexer.current, 1);
+}
+
+## Lexes the remaining part of a new line from by a carriage return and a line
+## feed combination.
+proc lex_crlf(lexer &Lexer) Result[Monostate, String] {
+  if !lexer.has_character() || lexer.character() != '\n' {
+    return Failure("Incomplete CRLF new line sequence!");
+  }
+  lexer.advance();
+}
