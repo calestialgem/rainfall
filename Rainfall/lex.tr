@@ -10,6 +10,7 @@ using thrice::Path;
 using thrice::Public;
 using thrice::Result;
 using thrice::Result::Failure;
+using thrice::Result::Success;
 using thrice::Size;
 using thrice::String;
 
@@ -59,7 +60,7 @@ proc lex(file &Path) List[Token] {
 }
 
 ## Context of the lexing process.
-struct Lexer(
+type Lexer(
   file &Path,
   contents String,
   tokens List[Token],
@@ -92,7 +93,8 @@ proc advance(lexer &Lexer) {
 ## feed combination.
 proc lex_crlf(lexer &Lexer) Result[Monostate, String] {
   if !lexer.has_character() || lexer.character() != '\n' {
-    return Failure("Incomplete CRLF new line sequence!");
+    return Failure[String](error: "Incomplete CRLF new line sequence!");
   }
   lexer.advance();
+  return Success[Monostate];
 }
